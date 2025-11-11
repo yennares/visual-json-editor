@@ -56,4 +56,10 @@ npm run preview  # Preview production build
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is open source and available under the [MIT License](LICENSE).
+
+**You are free to:**
+- Use commercially
+- Modify and distribute
+- Use privately
+- Sublicense
