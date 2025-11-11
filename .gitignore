@@ -24,3 +24,8 @@ public
 *.sln
 *.sw?
 
+# Other files
+SEO_SETUP.md
+metadata.json
+
+
