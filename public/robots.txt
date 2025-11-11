@@ -1,0 +1,26 @@
+# robots.txt for Visual JSON Editor
+
+# Allow all search engines to crawl everything
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://visualjsoneditor.com/sitemap.xml
+
+# Crawl-delay for polite crawling (optional)
+Crawl-delay: 1
+
+# Block common bot traps (if any in future)
+Disallow: /api/
+Disallow: /private/
+Disallow: /*.json$
+
+# Allow specific search engine bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

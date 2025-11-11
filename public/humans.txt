@@ -1,0 +1,19 @@
+/* TEAM */
+
+Developer: Visual JSON Editor Team
+Site: https://visualjsoneditor.com
+Location: Global
+
+/* THANKS */
+
+Thanks to all the developers and users who make this tool better every day.
+
+/* SITE */
+
+Last update: 2024/11/10
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Vite, TypeScript
+Software: Visual Studio Code, Claude Code
+Accessibility: WCAG 2.1 AA compliant
+Performance: Optimized for speed and efficiency
+Privacy: Client-side processing, no data collection
