@@ -42,7 +42,7 @@ const modalContent = {
         content: `
             <p>If you encounter any issues or have suggestions for improvement, we would love to hear from you.</p>
             <p>Please reach out to our support team via email:</p>
-            <p><strong>support@visualjsoneditor.dev</strong></p>
+            <p><strong>yennares@gmail.com</strong></p>
             <p>We will do our best to assist you as soon as possible.</p>
         `
     }
