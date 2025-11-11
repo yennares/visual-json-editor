@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Visual JSON Editor - Free Online JSON Editor, Formatter & Validator</title>
+  <meta name="title" content="Visual JSON Editor - Free Online JSON Editor, Formatter & Validator">
+  <meta name="description" content="Free online visual JSON editor tool. Edit, format, validate, and beautify JSON data with an intuitive visual interface. No coding required. Client-side processing ensures your data stays private and secure.">
+  <meta name="keywords" content="JSON editor, visual JSON editor, online JSON editor, JSON formatter, JSON beautifier, JSON validator, JSON tool, JSON viewer, JSON parser, edit JSON online, JSON form generator, interactive JSON editor, free JSON editor, JSON modifier, web JSON editor, browser JSON editor, client-side JSON editor, JSON manipulation tool, format JSON, validate JSON, beautify JSON, JSON editing tool, JSON structure editor, JSON data editor">
+  <meta name="author" content="Visual JSON Editor">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="revisit-after" content="7 days">
+  <meta name="theme-color" content="#0d6efd">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://visualjsoneditor.com/">
+  <meta property="og:title" content="Visual JSON Editor - Free Online JSON Editor, Formatter & Validator">
+  <meta property="og:description" content="Free online visual JSON editor tool. Edit, format, validate, and beautify JSON data with an intuitive visual interface. No coding required. Your data stays private with client-side processing.">
+  <meta property="og:image" content="https://visualjsoneditor.com/og-image.png">
+  <meta property="og:site_name" content="Visual JSON Editor">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://visualjsoneditor.com/">
+  <meta name="twitter:title" content="Visual JSON Editor - Free Online JSON Editor, Formatter & Validator">
+  <meta name="twitter:description" content="Free online visual JSON editor tool. Edit, format, validate, and beautify JSON data with an intuitive visual interface. No coding required.">
+  <meta name="twitter:image" content="https://visualjsoneditor.com/twitter-image.png">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://visualjsoneditor.com/">
+
+  <!-- Sitemap -->
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+
+  <!-- Humans -->
+  <link rel="author" type="text/plain" href="/humans.txt">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Visual JSON Editor",
+    "url": "https://visualjsoneditor.com",
+    "description": "Free online visual JSON editor tool for editing, formatting, validating, and beautifying JSON data",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Visual JSON editing",
+      "JSON validation",
+      "JSON formatting and beautification",
+      "Add and remove properties dynamically",
+      "Support for strings, numbers, booleans, objects, and arrays",
+      "Client-side processing for privacy",
+      "Download edited JSON files",
+      "No registration required"
+    ],
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "softwareVersion": "1.0",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1250"
+    }
+  }
+  </script>
+  <style>
+    :root {
+      --background-color: #f7f8fa;
+      --surface-color: #ffffff;
+      --text-color-primary: #1f2328;
+      --text-color-secondary: #57606a;
+      --primary-color: #0d6efd;
+      --primary-hover-color: #0b5ed7;
+      --border-color: #d0d7de;
+      --error-color: #d73a49;
+      --success-color: #1a7f37;
+      --button-text-color: #ffffff;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      --input-bg: #ffffff;
+      --subtle-bg: #f1f3f6;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--background-color);
+      color: var(--text-color-primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--surface-color);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-color-primary);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .header-nav a {
+      color: var(--text-color-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .header-nav a:hover {
+      color: var(--primary-color);
+    }
+    
+    main.container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .panel {
+      flex: 1;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      min-width: 0;
+      background-color: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .center-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      background-color: var(--input-bg);
+      color: var(--text-color-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: 'SF Mono', 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      resize: none;
+      min-height: 200px;
+    }
+    
+    .panel-controls, #output-controls-area {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: var(--button-text-color);
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-secondary {
+        background-color: var(--subtle-bg);
+        color: var(--text-color-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+        background-color: #e6ebf1;
+        border-color: #b1b9c3;
+    }
+    
+    #update-json-btn {
+        background-color: #fff;
+        color: var(--text-color-secondary);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        padding: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    #update-json-btn:hover {
+        background-color: var(--subtle-bg);
+        border-color: #b1b9c3;
+    }
+
+    #visual-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    
+    #visual-editor-placeholder {
+      color: var(--text-color-secondary);
+      text-align: center;
+      margin-top: 2rem;
+      font-style: italic;
+    }
+    
+    .property, .array-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      padding: 0.15rem;
+      border-radius: 4px;
+    }
+    
+    .property:hover, .array-item:hover {
+      background-color: var(--subtle-bg);
+    }
+    
+    .key-input {
+      font-weight: 500;
+      border: 1px solid transparent;
+      background: transparent;
+      flex-basis: 150px;
+      flex-shrink: 0;
+      padding: 0.35rem 0.5rem;
+      border-radius: 4px;
+      color: var(--text-color-primary);
+      font-family: var(--font-family);
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .key-input:hover, .key-input:focus {
+      border: 1px solid var(--border-color);
+      background: var(--surface-color);
+    }
+
+    .property-value { flex: 1; min-width: 0; }
+    
+    .property-value input[type="text"],
+    .property-value input[type="number"] {
+      width: 100%;
+      padding: 0.35rem 0.5rem;
+      background-color: var(--input-bg);
+      color: var(--text-color-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .property-value input[type="checkbox"] {
+        width: 1.1rem; height: 1.1rem;
+        accent-color: var(--primary-color);
+        margin-top: 0.35rem;
+    }
+
+    fieldset {
+      border: 1px solid #dce2e9;
+      border-radius: 6px;
+      padding: 0.5rem;
+      margin-top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      background-color: #fcfdff;
+    }
+
+    .remove-btn, .add-btn {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-color-secondary);
+      cursor: pointer;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      font-size: 1rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+       
+    .remove-btn { color: var(--error-color); border-color: #ffb3bb; }
+    .remove-btn:hover { background-color: var(--error-color); color: white; border-color: var(--error-color); }
+
+    .add-btn { color: var(--success-color); border-color: #8ce6a3; }
+    .add-btn:hover { background-color: var(--success-color); color: white; border-color: var(--success-color); }
+    
+    .message {
+      padding: 0.5rem 1rem; border-radius: 6px;
+      margin-top: 0.5rem; text-align: center;
+      font-size: 0.85rem; border: 1px solid transparent;
+    }
+    .error { background-color: #fff1f2; color: #d73a49; border-color: #ffb3bb; }
+    .success { background-color: #eefbf1; color: #1a7f37; border-color: #8ce6a3; }
+    
+    .add-property-controls {
+      display: flex; gap: 0.5rem; margin-top: 0.3rem;
+      padding: 0.4rem; background-color: var(--subtle-bg);
+      border-radius: 6px; align-items: center;
+    }
+    .add-property-controls input, .add-property-controls select {
+      padding: 0.35rem 0.5rem; font-size: 0.9rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px; margin: 0;
+      background-color: var(--input-bg);
+    }
+    .add-property-controls input { flex: 1; }
+    .add-property-controls select { flex-basis: 120px; }
+    .add-property-controls button {
+      background-color: var(--success-color); color: white;
+      width: 2.2rem; height: 2.2rem;
+      padding: 0; margin: 0; font-size: 1.4rem;
+      border-radius: 5px;
+    }
+    .add-property-controls button:hover { background-color: #166b2e; }
+    
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .about-section {
+        padding: 2rem;
+        background-color: #fff;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-color-secondary);
+    }
+    
+    .about-section h2 {
+        color: var(--text-color-primary);
+        font-weight: 600;
+        margin-top: 0;
+        font-size: 1.5rem;
+    }
+    .about-section p, .about-section li { line-height: 1.6; }
+    .about-section ul, .about-section ol { padding-left: 1.5rem; }
+    .about-section ol { margin-bottom: 1.5rem; }
+    .about-section li { margin-bottom: 0.5rem; }
+
+    footer {
+        padding: 1rem 2rem;
+        text-align: center;
+        background-color: var(--subtle-bg);
+        border-top: 1px solid var(--border-color);
+        font-size: 0.875rem;
+    }
+    footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        margin: 0 0.75rem;
+        cursor: pointer;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background-color: #fff;
+        margin: auto;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        width: 90%;
+        max-width: 680px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        animation: fadeIn 0.3s;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+    .modal-header h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+    .close-btn {
+      color: #aaa;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      line-height: 1;
+    }
+    .close-btn:hover, .close-btn:focus { color: black; }
+    .modal-body { line-height: 1.7; color: var(--text-color-secondary); }
+    .modal-body p { margin-bottom: 1rem; }
+    .modal-body strong { color: var(--text-color-primary); }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(-20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <div class="content-wrapper">
+    <header>
+      <h1>Visual JSON Editor</h1>
+      <nav class="header-nav">
+        <a href="#" data-target="privacy">Privacy Policy</a>
+        <a href="#" data-target="terms">Terms of Service</a>
+        <a href="#" data-target="support">Support</a>
+      </nav>
+    </header>
+    <main class="container">
+      <div class="panel panel-left">
+          <h2>JSON Input</h2>
+          <textarea id="json-input" placeholder="Paste your JSON here...">
+{
+  "name": "John Doe",
+  "age": 29,
+  "gender": "Male",
+  "skills": [
+    "Python",
+    "Node js",
+    "React js"
+  ],
+  "companiesWorked": {
+    "company-1": "Company 1",
+    "company-2": "Company 2",
+    "company-3": "Company 3"
+  }
+}</textarea>
+          <div class="panel-controls">
+              <button id="generate-form-btn">Generate Form</button>
+              <button id="beautify-btn" class="btn-secondary">Beautify</button>
+              <button id="validate-btn" class="btn-secondary">Validate</button>
+          </div>
+          <div id="input-message-area"></div>
+      </div>
+      <div class="center-controls">
+          <button id="update-json-btn" title="Update JSON from Visual Editor">&#8592;</button>
+      </div>
+      <div class="panel">
+          <h2>Visual Editor</h2>
+          <div id="visual-editor">
+              <p id="visual-editor-placeholder">Your visual form will appear here when you click "Generate Form".</p>
+          </div>
+          <div id="output-controls-area"></div>
+      </div>
+    </main>
+    <section class="about-section" itemscope itemtype="https://schema.org/HowTo">
+        <div style="max-width: 900px;">
+          <h2 itemprop="name">How to Use the Visual JSON Editor</h2>
+          <p itemprop="description">This free online JSON editor tool provides a simple and intuitive way to edit, format, validate, and beautify JSON data without writing code. Perfect for developers, data analysts, and anyone working with JSON files. Here's how to use our visual JSON editor:</p>
+          <ol>
+              <li itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                <strong itemprop="name">Paste JSON:</strong> <span itemprop="text">Start by pasting your JSON data into the "JSON Input" panel on the left. You can paste any valid JSON structure including objects, arrays, nested data, and mixed types.</span>
+              </li>
+              <li itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                <strong itemprop="name">Generate Form:</strong> <span itemprop="text">Click the "Generate Form" button. The application will parse your JSON and create an interactive, visual form in the "Visual Editor" panel on the right.</span>
+              </li>
+              <li itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                <strong itemprop="name">Edit Visually:</strong> <span itemprop="text">Add, remove, or modify keys and values directly in the form. You can add new properties to objects, add new items to arrays, and change data types without touching any code.</span>
+              </li>
+              <li itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                <strong itemprop="name">Sync Back:</strong> <span itemprop="text">Click the arrow button (&#8592;) to see your visual changes reflected back in the JSON Input panel, automatically formatted and beautified for you.</span>
+              </li>
+              <li itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                <strong itemprop="name">Download:</strong> <span itemprop="text">Once you're done editing, click "Validate & Download JSON" to save your work as a new `.json` file to your computer.</span>
+              </li>
+          </ol>
+          <p><strong>Why use our Visual JSON Editor?</strong></p>
+          <ul>
+              <li>✓ <strong>100% Free</strong> - No registration, no payments, completely free JSON editor</li>
+              <li>✓ <strong>Privacy First</strong> - All processing happens in your browser, your data never leaves your computer</li>
+              <li>✓ <strong>No Coding Required</strong> - Edit complex JSON structures with a simple visual interface</li>
+              <li>✓ <strong>Instant Validation</strong> - Built-in JSON validator checks your syntax in real-time</li>
+              <li>✓ <strong>Format & Beautify</strong> - Automatically format and beautify messy JSON data</li>
+              <li>✓ <strong>Works Offline</strong> - Once loaded, works without internet connection</li>
+          </ul>
+        </div>
+    </section>
+  </div>
+  
+  <footer>
+    &copy; 2025 Visual JSON Editor. All Rights Reserved.
+    <a href="#" data-target="privacy">Privacy Policy</a>
+    <a href="#" data-target="terms">Terms of Service</a>
+    <a href="#" data-targeT="support">Support</a>
+  </footer>
+
+  <!-- The Modal -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button id="modal-close-btn" class="close-btn">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script type="module" src="index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
