@@ -2,6 +2,8 @@
 
 A free, privacy-focused web application for editing JSON data visually without writing code. All processing happens client-side in your browser.
 
+**Live Demo:** [https://visual-json-editor-596508996664.us-central1.run.app/](https://visual-json-editor-596508996664.us-central1.run.app/)
+
 ![Visual JSON Editor](homepage.png)
 
 ## Features
