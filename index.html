@@ -172,10 +172,12 @@
     }
     
     .center-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        gap: 1rem;
     }
 
     .panel h2 {
@@ -381,7 +383,177 @@
       border-radius: 5px;
     }
     .add-property-controls button:hover { background-color: #166b2e; }
-    
+
+    /* Code Editor Styles */
+    .code-editor-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: var(--input-bg);
+    }
+
+    .code-editor-wrapper {
+        display: flex;
+        flex: 1;
+        overflow: auto;
+        position: relative;
+    }
+
+    .line-numbers {
+        background-color: #f6f8fa;
+        color: var(--text-color-secondary);
+        padding: 0.75rem 0.5rem;
+        font-family: 'SF Mono', 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        text-align: right;
+        user-select: none;
+        border-right: 1px solid var(--border-color);
+        min-width: 40px;
+        flex-shrink: 0;
+    }
+
+    .line-numbers .line-number {
+        display: block;
+        height: 1.5em;
+    }
+
+    .line-numbers .line-number.folded {
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .fold-gutter {
+        background-color: #f6f8fa;
+        padding: 0.75rem 0.25rem;
+        border-right: 1px solid var(--border-color);
+        min-width: 24px;
+        user-select: none;
+        flex-shrink: 0;
+    }
+
+    .fold-gutter .fold-btn {
+        display: block;
+        width: 16px;
+        height: 1.5em;
+        line-height: 1.5em;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 3px;
+        font-size: 10px;
+        color: var(--text-color-secondary);
+        transition: background-color 0.2s;
+    }
+
+    .fold-gutter .fold-btn:hover {
+        background-color: var(--subtle-bg);
+    }
+
+    .fold-gutter .fold-btn.collapsed::before {
+        content: '▶';
+    }
+
+    .fold-gutter .fold-btn.expanded::before {
+        content: '▼';
+    }
+
+    .fold-gutter .fold-btn.collapsible::before {
+        content: '▼';
+    }
+
+    .fold-gutter .fold-btn.empty {
+        cursor: default;
+    }
+
+    .fold-gutter .fold-btn.empty::before {
+        content: '';
+    }
+
+    .code-content {
+        flex: 1;
+        position: relative;
+        display: flex;
+    }
+
+    #json-input {
+        flex: 1;
+        border: none;
+        border-radius: 0;
+        padding: 0.75rem;
+        line-height: 1.5;
+        min-height: auto;
+        resize: none;
+        outline: none;
+        background: transparent;
+        position: relative;
+        z-index: 1;
+    }
+
+    .fold-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 2;
+        font-family: 'SF Mono', 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        padding: 0.75rem;
+        white-space: pre;
+        overflow: hidden;
+    }
+
+    .fold-overlay .folded-line {
+        background-color: #e3f2fd;
+        color: var(--primary-color);
+        cursor: pointer;
+        pointer-events: auto;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .fold-overlay .folded-line:hover {
+        background-color: #bbdefb;
+    }
+
+    .fold-overlay .folded-placeholder {
+        color: var(--text-color-secondary);
+        font-style: italic;
+    }
+
+    /* Highlighted property in visual editor */
+    .property.highlighted {
+        background-color: #fff3cd !important;
+        border: 2px solid #ffc107;
+        border-radius: 4px;
+        animation: highlightPulse 0.5s ease-in-out;
+    }
+
+    @keyframes highlightPulse {
+        0% { background-color: #fff3cd; }
+        50% { background-color: #ffeaa7; }
+        100% { background-color: #fff3cd; }
+    }
+
+    /* Arrow button style for Generate Form */
+    .arrow-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+    }
+
     .content-wrapper {
       flex: 1;
       overflow-y: auto;
@@ -488,8 +660,12 @@
     <main class="container">
       <div class="panel panel-left">
           <h2>JSON Input</h2>
-          <textarea id="json-input" placeholder="Paste your JSON here...">
-{
+          <div class="code-editor-container">
+              <div class="code-editor-wrapper">
+                  <div class="line-numbers" id="line-numbers"></div>
+                  <div class="fold-gutter" id="fold-gutter"></div>
+                  <div class="code-content">
+                      <textarea id="json-input" placeholder="Paste your JSON here...">{
   "name": "John Doe",
   "age": 29,
   "gender": "Male",
@@ -504,14 +680,19 @@
     "company-3": "Company 3"
   }
 }</textarea>
+                      <div class="fold-overlay" id="fold-overlay"></div>
+                  </div>
+              </div>
+          </div>
           <div class="panel-controls">
-              <button id="generate-form-btn">Generate Form</button>
               <button id="beautify-btn" class="btn-secondary">Beautify</button>
               <button id="validate-btn" class="btn-secondary">Validate</button>
+              <button id="copy-btn" class="btn-secondary" title="Copy JSON">Copy</button>
           </div>
           <div id="input-message-area"></div>
       </div>
       <div class="center-controls">
+          <button id="generate-form-btn" class="arrow-btn" title="Generate Form">&#8594;</button>
           <button id="update-json-btn" title="Update JSON from Visual Editor">&#8592;</button>
       </div>
       <div class="panel">

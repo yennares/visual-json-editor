@@ -3,11 +3,27 @@ const jsonInput = document.getElementById('json-input') as HTMLTextAreaElement;
 const generateFormBtn = document.getElementById('generate-form-btn') as HTMLButtonElement;
 const beautifyBtn = document.getElementById('beautify-btn') as HTMLButtonElement;
 const validateBtn = document.getElementById('validate-btn') as HTMLButtonElement;
+const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
 const updateJsonBtn = document.getElementById('update-json-btn') as HTMLButtonElement;
 const visualEditor = document.getElementById('visual-editor') as HTMLDivElement;
 const inputMessageArea = document.getElementById('input-message-area') as HTMLDivElement;
 const outputControlsArea = document.getElementById('output-controls-area') as HTMLDivElement;
 const visualEditorPlaceholder = document.getElementById('visual-editor-placeholder') as HTMLParagraphElement;
+const lineNumbersEl = document.getElementById('line-numbers') as HTMLDivElement;
+const foldGutterEl = document.getElementById('fold-gutter') as HTMLDivElement;
+const foldOverlayEl = document.getElementById('fold-overlay') as HTMLDivElement;
+
+// Code folding state
+interface FoldRange {
+    startLine: number;
+    endLine: number;
+    collapsed: boolean;
+}
+let foldRanges: FoldRange[] = [];
+let foldedLines: Set<number> = new Set();
+
+// Store original JSON content
+let originalJsonContent: string = '';
 
 // Modal Elements
 const modal = document.getElementById('info-modal') as HTMLDivElement;
@@ -87,6 +103,233 @@ modal.addEventListener('click', (e) => {
     }
 });
 
+
+// --- Code Folding Functions ---
+
+/**
+ * Parses JSON and identifies foldable ranges (objects and arrays)
+ */
+const parseFoldRanges = (text: string): FoldRange[] => {
+    const ranges: FoldRange[] = [];
+    const lines = text.split('\n');
+    const stack: { char: string; line: number }[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            if (char === '{' || char === '[') {
+                stack.push({ char, line: i });
+            } else if ((char === '}' || char === ']') && stack.length > 0) {
+                const start = stack.pop();
+                if (start && start.line < i) {
+                    ranges.push({
+                        startLine: start.line,
+                        endLine: i,
+                        collapsed: false
+                    });
+                }
+            }
+        }
+    }
+    return ranges.sort((a, b) => a.startLine - b.startLine);
+};
+
+/**
+ * Updates line numbers display
+ */
+const updateLineNumbers = () => {
+    if (!lineNumbersEl) return;
+    const lines = originalJsonContent.split('\n');
+    const totalLines = lines.length;
+    lineNumbersEl.innerHTML = '';
+    for (let i = 1; i <= totalLines; i++) {
+        const lineNum = document.createElement('span');
+        lineNum.className = 'line-number';
+        // Check if this line is the start of a folded range
+        if (foldedLines.has(i - 1)) {
+            lineNum.classList.add('folded');
+        }
+        lineNum.textContent = i.toString();
+        lineNumbersEl.appendChild(lineNum);
+    }
+};
+
+/**
+ * Updates fold gutter display
+ */
+const updateFoldGutter = () => {
+    if (!foldGutterEl) return;
+    foldRanges = parseFoldRanges(originalJsonContent);
+    const lines = originalJsonContent.split('\n');
+    foldGutterEl.innerHTML = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        const foldBtn = document.createElement('span');
+        foldBtn.className = 'fold-btn';
+
+        // Find if this line starts a foldable range
+        const range = foldRanges.find(r => r.startLine === i);
+
+        if (range) {
+            foldBtn.classList.add(foldedLines.has(i) ? 'collapsed' : 'expanded');
+            foldBtn.classList.add('collapsible');
+            foldBtn.onclick = () => toggleFold(i);
+        } else {
+            foldBtn.classList.add('empty');
+        }
+
+        foldGutterEl.appendChild(foldBtn);
+    }
+};
+
+/**
+ * Updates the fold overlay to show folded regions
+ */
+const updateFoldOverlay = () => {
+    if (!foldOverlayEl) return;
+    const lines = originalJsonContent.split('\n');
+    let overlayHTML = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        const isFoldedStart = foldedLines.has(i);
+        const isInFoldedRange = Array.from(foldedLines).some(startLine => {
+            const range = foldRanges.find(r => r.startLine === startLine);
+            return range && i > range.startLine && i <= range.endLine;
+        });
+
+        if (isFoldedStart) {
+            const range = foldRanges.find(r => r.startLine === i);
+            const lineContent = lines[i];
+            const endLineNum = range ? range.endLine + 1 : i + 1;
+            overlayHTML += `<span class="folded-line" data-line="${i}" onclick="expandFold(${i})">${escapeHtml(lineContent)} <span class="folded-placeholder">... [${endLineNum - i - 1} lines hidden] ...</span></span>\n`;
+        } else if (isInFoldedRange) {
+            // Hide this line completely
+            overlayHTML += `<span style="display:none">${escapeHtml(lines[i])}</span>\n`;
+        } else {
+            // Show normal line (transparent)
+            overlayHTML += `<span style="color:transparent">${escapeHtml(lines[i])}</span>\n`;
+        }
+    }
+
+    foldOverlayEl.innerHTML = overlayHTML;
+};
+
+/**
+ * Escapes HTML special characters
+ */
+const escapeHtml = (text: string): string => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+};
+
+/**
+ * Expands a folded section
+ */
+const expandFold = (lineIndex: number) => {
+    foldedLines.delete(lineIndex);
+    applyFolding();
+};
+
+// Make expandFold available globally
+(window as any).expandFold = expandFold;
+
+/**
+ * Toggles fold state for a line
+ */
+const toggleFold = (lineIndex: number) => {
+    const range = foldRanges.find(r => r.startLine === lineIndex);
+    if (!range) return;
+
+    if (foldedLines.has(lineIndex)) {
+        foldedLines.delete(lineIndex);
+    } else {
+        foldedLines.add(lineIndex);
+    }
+
+    applyFolding();
+};
+
+/**
+ * Applies folding to update the display
+ */
+const applyFolding = () => {
+    updateLineNumbers();
+    updateFoldGutter();
+    updateFoldOverlay();
+};
+
+/**
+ * Gets the current line number based on cursor position
+ */
+const getCurrentLineNumber = (): number => {
+    const cursorPos = jsonInput.selectionStart;
+    const textBeforeCursor = jsonInput.value.substring(0, cursorPos);
+    return textBeforeCursor.split('\n').length - 1;
+};
+
+/**
+ * Gets the JSON path at the current cursor position or selection
+ */
+const getPathAtPosition = (text: string, position: number): string | null => {
+    const lines = text.substring(0, position).split('\n');
+    const currentLineIndex = lines.length - 1;
+    const currentLine = lines[currentLineIndex];
+    const allLines = text.split('\n');
+
+    // Try to find the key on current line
+    const keyMatch = currentLine.match(/"([^"]+)"\s*:/);
+    if (keyMatch) {
+        return keyMatch[1];
+    }
+
+    // Look backwards for the containing key
+    for (let i = currentLineIndex; i >= 0; i--) {
+        const line = allLines[i];
+        const match = line.match(/"([^"]+)"\s*:/);
+        if (match) {
+            // Check if we're inside this object's scope
+            let braceCount = 0;
+            let bracketCount = 0;
+            for (let j = i; j <= currentLineIndex; j++) {
+                for (const char of allLines[j]) {
+                    if (char === '{') braceCount++;
+                    else if (char === '}') braceCount--;
+                    else if (char === '[') bracketCount++;
+                    else if (char === ']') bracketCount--;
+                }
+            }
+            if (braceCount > 0 || bracketCount > 0) {
+                return match[1];
+            }
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Highlights a property in the visual editor
+ */
+const highlightProperty = (key: string | null) => {
+    // Remove existing highlights
+    document.querySelectorAll('.property.highlighted').forEach(el => {
+        el.classList.remove('highlighted');
+    });
+
+    if (!key) return;
+
+    // Find and highlight the property
+    const properties = visualEditor.querySelectorAll('.property');
+    properties.forEach(prop => {
+        const keyInput = prop.querySelector('.key-input') as HTMLInputElement;
+        if (keyInput && keyInput.value === key) {
+            prop.classList.add('highlighted');
+            prop.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+};
 
 // --- Helper Functions ---
 
@@ -575,5 +818,48 @@ const handleDownload = () => {
 
 // Auto-generate form on load with the sample JSON
 document.addEventListener('DOMContentLoaded', () => {
+    originalJsonContent = jsonInput.value;
+    applyFolding();
     generateFormBtn.click();
+});
+
+// Handle textarea input for updating line numbers and fold gutter
+jsonInput.addEventListener('input', () => {
+    originalJsonContent = jsonInput.value;
+    // Clear folded lines when content changes significantly
+    foldedLines.clear();
+    applyFolding();
+});
+
+// Handle selection change to highlight corresponding property
+jsonInput.addEventListener('mouseup', () => {
+    const selectedText = jsonInput.value.substring(jsonInput.selectionStart, jsonInput.selectionEnd);
+    if (selectedText.length > 0) {
+        // If text is selected, try to find a key in the selection
+        const keyMatch = selectedText.match(/"([^"]+)"/);
+        if (keyMatch) {
+            highlightProperty(keyMatch[1]);
+        } else {
+            // Try to get path at selection start
+            const path = getPathAtPosition(jsonInput.value, jsonInput.selectionStart);
+            highlightProperty(path);
+        }
+    }
+});
+
+jsonInput.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const path = getPathAtPosition(jsonInput.value, jsonInput.selectionStart);
+        highlightProperty(path);
+    }
+});
+
+// Handle copy button
+copyBtn.addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(jsonInput.value);
+        showMessage('JSON copied to clipboard!', 'success');
+    } catch (err) {
+        showMessage('Failed to copy JSON.', 'error');
+    }
 });
